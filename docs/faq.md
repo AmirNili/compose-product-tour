@@ -1,19 +1,25 @@
 # FAQ
 
-### اگر step target نداشته باشد چه می‌شود؟
+### What happens when a target is not registered?
 
-تور متوقف یا crash نمی‌کند؛ تا زمانی که target با bounds معتبر ثبت شود tooltip و spotlight
-نمایش داده نمی‌شوند.
+The tour state remains valid, but the overlay and tooltip are not rendered
+until the target has valid layout coordinates.
 
-### آیا Material 3 اجباری است؟
+### Is Material 3 required?
 
-خیر. core و ui بدون Material کار می‌کنند و adapter Material در ماژول جداگانه است.
+No. Core and UI do not depend on Material 3. The Material module is optional.
 
-### آیا scroll خودکار وجود دارد؟
+### Does the library scroll to a target automatically?
 
-در `0.1.0` orchestration کامل scroll ارائه نشده است. اپلیکیشن می‌تواند پیش از `next()` با
-`BringIntoViewRequester` یا scroll state خود target را آماده کند.
+Not yet. The target registration and positioning contracts leave room for a
+future scroll coordinator.
 
-### آیا state سراسری است؟
+### How do I localize step text?
 
-خیر. state با `rememberProductTourState` ساخته و توسط caller hoist می‌شود.
+Use `titleResId` and `descriptionResId` on `TourStep`. The UI resolves them
+against the host application's current locale configuration.
+
+### How do I style different product themes?
+
+Use `ProductTourOverlayStyle`, `ProductTourTooltipStyle`, and
+`MaterialTourTooltipStyle`. See [Theming](theming.md).

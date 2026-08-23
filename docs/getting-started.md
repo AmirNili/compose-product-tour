@@ -1,8 +1,8 @@
 # Getting started
 
-## 1. Define steps
+## Define steps
 
-هر step یک `id` یکتا دارد. ID باید پایدار باشد و با target متناظر یکی باشد.
+Each step must have a unique ID matching a target in the composition.
 
 ```kotlin
 val steps = listOf(
@@ -11,36 +11,31 @@ val steps = listOf(
         titleResId = R.string.tour_search_title,
         descriptionResId = R.string.tour_search_description,
         spotlightShape = SpotlightShape.RoundedRectangle,
+        padding = 8f,
     ),
 )
 ```
 
-## 2. Host the tour
+## Register targets
 
 ```kotlin
-val tourState = rememberProductTourState(
-    callbacks = TourCallbacks(
-        onStepChanged = { step, index -> analytics.track("tour_step", step.id) },
-        onFinished = { /* persist completion in the app */ },
-        onSkipped = { /* record a skip */ },
-    ),
-)
-
-ProductTour(state = tourState, steps = steps) {
+ProductTour(state = state, steps = steps) {
     SearchButton(Modifier.tourTarget("search"))
 }
 ```
 
-`start()` را از event کاربر یا lifecycle مناسب اپلیکیشن صدا بزنید. اگر target هنوز layout نشده
-باشد، overlay تا دریافت bounds معتبر نمایش داده نمی‌شود.
+Targets register their layout bounds and unregister automatically when they
+leave the composition.
 
-## 3. Build and publish locally
+## Start and restart
 
-```text
-./gradlew clean build
-./gradlew publishToMavenLocal
+```kotlin
+val state = rememberProductTourState()
+
+LaunchedEffect(Unit) {
+    state.start()
+}
 ```
 
-After `finish()` or `skip()`, the next `start()` call begins at the first step again.
-
-برای استفاده از Material 3، ماژول `compose-product-tour-material` را نیز اضافه کنید.
+After `finish()` or `skip()`, the next `start()` begins at the first step.
+`Previous` is hidden while the first step is active.

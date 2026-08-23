@@ -1,5 +1,8 @@
 # Code of Conduct
 
-ما متعهد به محیطی محترمانه، فراگیر و حرفه‌ای هستیم. آزار، تبعیض، تهدید، انتشار اطلاعات
-خصوصی و رفتار مختل‌کننده پذیرفته نیست. موارد مشکل‌دار را به نگهدارنده پروژه گزارش کنید؛
-تمام گزارش‌ها با محرمانگی مناسب بررسی می‌شوند.
+We are committed to a respectful, inclusive, and professional community.
+Harassment, discrimination, threats, doxxing, and disruptive behavior are not
+acceptable.
+
+Report concerns privately to the project maintainers. Reports will be reviewed
+confidentially and handled fairly.

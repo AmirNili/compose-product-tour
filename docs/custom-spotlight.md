@@ -1,13 +1,23 @@
 # Custom spotlight
 
-در نسخه `0.1.0` سه شکل پایه ارائه می‌شود:
+The built-in renderer supports:
 
 - `SpotlightShape.RoundedRectangle`
 - `SpotlightShape.Circle`
+- `SpotlightShape.Rounded(cornerRadius)`
 
-برای گوشه سفارشی از `SpotlightShape.Rounded(cornerRadius)` استفاده کنید. renderer در ماژول UI
-قرار دارد و core فقط مدل shape و bounds را می‌شناسد؛ بنابراین می‌توان در نسخه بعد renderer
-تزریق‌پذیر برای path، glow یا چند spotlight اضافه کرد بدون تغییر قرارداد state.
+Use `TourStep.padding` to expand the highlighted bounds. Configure the
+spotlight border through `ProductTourOverlayStyle`.
 
-`TourStep.padding` فاصله اطراف target را بر حسب dp مشخص می‌کند و border اختیاری در
-`ProductTourUiConfig` تنظیم می‌شود.
+```kotlin
+ProductTourUiConfig(
+    overlayStyle = ProductTourOverlayStyle(
+        spotlightBorderColor = Color(0xFF7F56D9),
+        spotlightBorderWidth = 2f,
+    ),
+)
+```
+
+For a completely custom renderer, keep the core `SpotlightShape` and `Bounds`
+contracts unchanged and provide a custom UI layer in a future extension
+module.

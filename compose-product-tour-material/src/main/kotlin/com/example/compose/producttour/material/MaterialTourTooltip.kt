@@ -40,41 +40,50 @@ public fun MaterialTourTooltip(
         labels: TourLabels,
         progress: String?,
     ) -> Unit)? = null,
+    style: MaterialTourTooltipStyle = MaterialTourTooltipStyle(),
 ) {
     if (content != null) {
         content(step, actions, labels, progress)
         return
     }
+    val effectiveShape = style.shape ?: shape
+    val effectiveTypography = style.typography ?: typography
+    val effectiveContainerColor = style.containerColor ?: colors.surface
+    val effectiveContentColor = style.contentColor ?: colors.onSurface
+    val textButtonContentColor = style.textButtonContentColor ?: colors.primary
+    val primaryButtonContainerColor = style.primaryButtonContainerColor ?: colors.primary
+    val primaryButtonContentColor = style.primaryButtonContentColor ?: colors.onPrimary
+
     Surface(
         modifier = modifier,
-        shape = shape,
-        color = colors.surface,
-        contentColor = colors.onSurface,
-        tonalElevation = 4.dp,
+        shape = effectiveShape,
+        color = effectiveContainerColor,
+        contentColor = effectiveContentColor,
+        tonalElevation = style.tonalElevation,
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(style.contentPadding),
+            verticalArrangement = Arrangement.spacedBy(style.contentSpacing),
         ) {
-            Text(text = step.title, style = typography.titleMedium)
-            Text(text = step.description, style = typography.bodyMedium)
-            progress?.let { Text(text = it, style = typography.labelMedium) }
+            Text(text = step.title, style = effectiveTypography.titleMedium)
+            Text(text = step.description, style = effectiveTypography.bodyMedium)
+            progress?.let { Text(text = it, style = effectiveTypography.labelMedium) }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(style.actionSpacing),
             ) {
                 Button(
                     onClick = actions.skip,
-                    colors = ButtonDefaults.textButtonColors(contentColor = colors.primary),
+                    colors = ButtonDefaults.textButtonColors(contentColor = textButtonContentColor),
                 ) {
-                    Text(labels.skip, style = typography.labelLarge)
+                    Text(labels.skip, style = effectiveTypography.labelLarge)
                 }
                 if (actions.canGoPrevious) {
                     Button(
                         onClick = actions.previous,
-                        colors = ButtonDefaults.textButtonColors(contentColor = colors.primary),
+                        colors = ButtonDefaults.textButtonColors(contentColor = textButtonContentColor),
                     ) {
-                        Text(labels.previous, style = typography.labelLarge)
+                        Text(labels.previous, style = effectiveTypography.labelLarge)
                     }
                 }
                 Button(
@@ -86,6 +95,10 @@ public fun MaterialTourTooltip(
                     } else {
                         actions.next
                     },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = primaryButtonContainerColor,
+                        contentColor = primaryButtonContentColor,
+                    ),
                 ) {
                     Text(
                         text = if (progress?.let {
@@ -96,7 +109,7 @@ public fun MaterialTourTooltip(
                         } else {
                             labels.next
                         },
-                        style = typography.labelLarge,
+                        style = effectiveTypography.labelLarge,
                     )
                 }
             }

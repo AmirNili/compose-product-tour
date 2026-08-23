@@ -1,9 +1,10 @@
 # Known issues
 
-- اجرای تست‌های `androidTest` به emulator یا دستگاه متصل نیاز دارد؛ CI پایه فعلاً compile آن‌ها
-  را تضمین می‌کند.
-- persistence، deep-link و scroll خودکار عمداً به نسخه بعد منتقل شده‌اند.
-- برای پنجره‌های بسیار کوچک، tooltip به نزدیک‌ترین مکان clamp می‌شود و ممکن است با محتوای اپ
-  هم‌پوشانی داشته باشد؛ اپلیکیشن باید اندازه و محتوای tooltip را کنترل کند.
-- ترتیب پویا باید با `updateSteps` مدیریت شود؛ هنگام تغییر IDها، caller باید targetهای جدید را
-  در composition نگه دارد.
+- Compose `androidTest` sources require an emulator or connected device to
+  execute. CI currently compiles the instrumentation test source.
+- Automatic scrolling, persistence, and deep-link orchestration are planned
+  for a future release.
+- On very small windows, the tooltip is clamped to the available bounds and
+  may overlap application content.
+- Dynamic step ID changes require the caller to keep matching targets in the
+  composition.

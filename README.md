@@ -1,122 +1,108 @@
 # Compose Product Tour
 
-یک کتابخانه ماژولار و قابل تست برای Product Tour، Coach Mark، Tooltip و Spotlight در Android
-Jetpack Compose.
+A modular, testable Product Tour and Coach Marks library for Android Jetpack Compose.
 
-> وضعیت: نسخه اولیه `0.1.0` آماده build و انتشار Maven است.
+## Features
 
-## قابلیت‌ها
+- Hoisted tour state with `start`, `next`, `previous`, `skip`, and `finish`.
+- Lifecycle-aware targets through `Modifier.tourTarget("id")`.
+- Rectangle, rounded rectangle, and circular spotlights.
+- Adaptive tooltip placement with RTL/LTR support.
+- Configurable overlay, spotlight, tooltip, typography, colors, shapes, and animations.
+- Material 3 tooltip adapter.
+- Resource-backed step text for application localization.
+- Accessibility semantics for tooltip content and navigation actions.
+- No global mutable state and no Material dependency in core.
 
-- state hoisting و کنترل کامل `start`, `next`, `previous`, `skip`, `finish`
-- ثبت lifecycle-aware هدف‌ها با `Modifier.tourTarget`
-- spotlightهای مستطیلی، گوشه‌گرد و دایره‌ای
-- جایگذاری tooltip با fallback و محدودسازی داخل window
-- پشتیبانی RTL/LTR و انیمیشن قابل غیرفعال‌سازی
-- tooltip پیش‌فرض مستقل از Material و adapter اختیاری Material 3
-- callbackهای مرحله، پایان و ردکردن
-- semantics برای محتوای tooltip، دکمه‌ها و action ردکردن
-
-## دمو
-
-اپ نمونه در ماژول `sample` سناریوی چندمرحله‌ای واقعی را نمایش می‌دهد. برای انتشار رسانه‌ای،
-فایل پیشنهادی `docs/media/product-tour-demo.gif` است؛ در صورت نبود فایل، این مسیر را با GIF
-گرفته‌شده از Sample جایگزین کنید.
-
-## نیازمندی‌ها
+## Requirements
 
 - Android API 24+
-- Kotlin 2.2+
-- Jetpack Compose 1.9+
-- برای adapter Material: Material 3
+- Kotlin and Jetpack Compose versions defined in `gradle/libs.versions.toml`
+- Java 17 for Gradle builds
 
-## نصب
-
-ماژول‌های مورد نیاز را اضافه کنید (مختصات نسخه در `gradle.properties` متمرکز است):
+## Installation
 
 ```kotlin
-implementation("com.example.compose.producttour:compose-product-tour-core:0.1.0")
-implementation("com.example.compose.producttour:compose-product-tour-ui:0.1.0")
-implementation("com.example.compose.producttour:compose-product-tour-material:0.1.0")
+dependencies {
+    implementation("io.github.amirnili:compose-product-tour-core:0.1.0")
+    implementation("io.github.amirnili:compose-product-tour-ui:0.1.0")
+    implementation("io.github.amirnili:compose-product-tour-material:0.1.0")
+}
 ```
 
-اگر Material 3 نمی‌خواهید، فقط core و ui را استفاده کنید.
-
-## شروع سریع
+## Quick start
 
 ```kotlin
 val steps = listOf(
-    TourStep("search", "جست‌وجو", "برای پیدا کردن محتوا از اینجا شروع کنید."),
-    TourStep("save", "ذخیره", "آیتم‌های مهم را ذخیره کنید."),
+    TourStep(
+        id = "search",
+        titleResId = R.string.tour_search_title,
+        descriptionResId = R.string.tour_search_description,
+        spotlightShape = SpotlightShape.RoundedRectangle,
+    ),
 )
-val state = rememberProductTourState()
 
-ProductTour(state = state, steps = steps) {
+val tourState = rememberProductTourState()
+
+ProductTour(state = tourState, steps = steps) {
     SearchButton(Modifier.tourTarget("search"))
-    SaveButton(Modifier.tourTarget("save"))
 }
 
-LaunchedEffect(Unit) { state.start() }
+LaunchedEffect(Unit) {
+    tourState.start()
+}
 ```
 
-برای tooltip Material 3، `MaterialTourTooltip` را در slot سفارشی `tooltipContent` قرار دهید.
+## Theming
 
-## سفارشی‌سازی
+Use `ProductTourOverlayStyle` for the scrim and spotlight, and
+`ProductTourTooltipStyle` for the dependency-free tooltip:
 
-- `ProductTourUiConfig` رنگ overlay، border، placement، progress، animation و labelها را کنترل می‌کند.
-- برای tooltip کاملاً سفارشی، slot `tooltipContent` را پیاده‌سازی کنید.
-- برای spotlight جدید، `SpotlightShape` و renderer را در لایه UI توسعه دهید؛ core به Compose وابسته نیست.
-- قرارداد pure `TooltipPositioner` برای الگوریتم جایگذاری قابل unit test است.
-
-راهنمای کامل در [getting-started](docs/getting-started.md)، [custom-tooltip](docs/custom-tooltip.md)
-و [custom-spotlight](docs/custom-spotlight.md) موجود است.
-
-## معماری و ماژول‌ها
-
-- `compose-product-tour-core`: مدل، state، target contract و positioning مستقل از UI
-- `compose-product-tour-ui`: Composable، overlay، spotlight و target lifecycle
-- `compose-product-tour-animation`: تنظیمات animation
-- `compose-product-tour-material`: adapter اختیاری Material 3
-- `sample`: مصرف‌کننده واقعی API
-
-جزئیات در [docs/architecture.md](docs/architecture.md) است.
-
-## محدودیت‌های فعلی
-
-Scroll خودکار، persistence و اجرای runtime تست‌های instrumentation به device/emulator متصل نیاز
-دارند و در این نسخه abstraction یا پوشش اولیه دارند. موارد شناخته‌شده در
-[known-issues](docs/known-issues.md) ثبت شده‌اند.
-
-## Roadmap
-
-نسخه بعدی روی scroll orchestration، API پایدارتر برای custom spotlight renderer، Dokka انتشار‌یافته،
-و تست accessibility با TalkBack تمرکز خواهد کرد.
-
-## مشارکت
-
-راهنمای توسعه در [CONTRIBUTING.md](CONTRIBUTING.md) و قوانین رفتاری در
-[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) است. برای گزارش آسیب‌پذیری به
-[SECURITY.md](SECURITY.md) مراجعه کنید.
-
-## انتشار
-
-برای ساخت AARهای release:
-
-```text
-./gradlew :compose-product-tour-core:bundleReleaseAar
-./gradlew :compose-product-tour-ui:bundleReleaseAar
-./gradlew :compose-product-tour-animation:bundleReleaseAar
-./gradlew :compose-product-tour-material:bundleReleaseAar
+```kotlin
+ProductTourUiConfig(
+    overlayStyle = ProductTourOverlayStyle(
+        color = Color(0xFF101828),
+        alpha = 0.72f,
+        spotlightBorderColor = Color(0xFF7F56D9),
+        spotlightBorderWidth = 2f,
+    ),
+    tooltipStyle = ProductTourTooltipStyle(
+        containerColor = Color(0xFF1D2939),
+        contentColor = Color.White,
+        actionContentColor = Color(0xFFD6BBFB),
+    ),
+)
 ```
 
-برای ساخت sources JAR و انتشار محلی:
+For Material 3, pass `MaterialTourTooltipStyle` to `MaterialTourTooltip`.
+Applications can replace the complete `tooltipContent` slot for full control.
 
-```text
-./gradlew publishToMavenLocal
+## Modules
+
+- `compose-product-tour-core`: framework-independent models, state, targets, and positioning.
+- `compose-product-tour-ui`: Compose container, overlay, spotlight, tooltip, and target integration.
+- `compose-product-tour-animation`: animation configuration.
+- `compose-product-tour-material`: optional Material 3 tooltip implementation.
+- `sample`: runnable demonstration application.
+
+## Documentation
+
+- [Getting started](docs/getting-started.md)
+- [Theming](docs/theming.md)
+- [Custom tooltip](docs/custom-tooltip.md)
+- [Custom spotlight](docs/custom-spotlight.md)
+- [Architecture](docs/architecture.md)
+- [FAQ](docs/faq.md)
+- [Known issues](docs/known-issues.md)
+
+## Build and test
+
+```bash
+./gradlew clean build
+./gradlew test
+./gradlew lint
 ```
-
-workflow تگ‌های `v*` به GitHub Packages منتشر می‌کند. مقادیر `SIGNING_KEY`،
-`SIGNING_PASSWORD` و `GITHUB_TOKEN` فقط از GitHub Secrets خوانده می‌شوند.
 
 ## License
 
-Apache License 2.0؛ متن کامل در [LICENSE](LICENSE).
+Apache License 2.0. See [LICENSE](LICENSE).

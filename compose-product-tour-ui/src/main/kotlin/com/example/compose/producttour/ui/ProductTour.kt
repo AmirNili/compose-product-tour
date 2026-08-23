@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -96,9 +95,29 @@ public data class TooltipActions(
  * UI configuration for overlay, spotlight and tooltip behavior.
  */
 public data class ProductTourUiConfig(
+    @Deprecated(
+        message = "Use overlayStyle.color instead.",
+        replaceWith = ReplaceWith("overlayStyle = ProductTourOverlayStyle(color = value)"),
+    )
     val overlayColor: Color = Color.Black,
+    @Deprecated(
+        message = "Use overlayStyle.alpha instead.",
+        replaceWith = ReplaceWith("overlayStyle = ProductTourOverlayStyle(alpha = value)"),
+    )
     val overlayAlpha: Float = 0.64f,
+    @Deprecated(
+        message = "Use overlayStyle.spotlightBorderColor instead.",
+        replaceWith = ReplaceWith(
+            "overlayStyle = ProductTourOverlayStyle(spotlightBorderColor = value)",
+        ),
+    )
     val spotlightBorderColor: Color = Color.Transparent,
+    @Deprecated(
+        message = "Use overlayStyle.spotlightBorderWidth instead.",
+        replaceWith = ReplaceWith(
+            "overlayStyle = ProductTourOverlayStyle(spotlightBorderWidth = value)",
+        ),
+    )
     val spotlightBorderWidth: Float = 0f,
     val showProgress: Boolean = true,
     val preferredPlacement: TooltipPlacement = TooltipPlacement.Auto,
@@ -106,6 +125,11 @@ public data class ProductTourUiConfig(
     val labels: TourLabels = TourLabels(),
     val overlayContentDescription: String? = null,
     val tooltipContentDescription: String? = null,
+    val tooltipStyle: ProductTourTooltipStyle = ProductTourTooltipStyle(),
+    /**
+     * New visual configuration. When null, deprecated visual fields above are used.
+     */
+    val overlayStyle: ProductTourOverlayStyle? = null,
 )
 
 private interface ReactiveProductTourState {
@@ -176,6 +200,8 @@ internal val LocalTargetRegistry = compositionLocalOf<TargetRegistry> {
     error("tourTarget must be used inside ProductTour")
 }
 
+internal val LocalTooltipStyle = compositionLocalOf { ProductTourTooltipStyle() }
+
 /**
  * Remembers a state holder that can be passed to [ProductTour].
  */
@@ -208,7 +234,13 @@ public fun ProductTour(
         labels: TourLabels,
         progress: String?,
     ) -> Unit = { step, actions, labels, progress ->
-        DefaultTourTooltip(step, actions, labels, progress)
+        DefaultTourTooltip(
+            step = step,
+            actions = actions,
+            labels = labels,
+            progress = progress,
+            style = LocalTooltipStyle.current,
+        )
     },
     content: @Composable () -> Unit,
 ) {
@@ -220,7 +252,10 @@ public fun ProductTour(
         state.updateSteps(steps)
     }
 
-    CompositionLocalProvider(LocalTargetRegistry provides registry) {
+    CompositionLocalProvider(
+        LocalTargetRegistry provides registry,
+        LocalTooltipStyle provides config.tooltipStyle,
+    ) {
         key(revision) {
             Box(
                 modifier = modifier
@@ -284,22 +319,26 @@ private fun DefaultTourTooltip(
     actions: TooltipActions,
     labels: TourLabels,
     progress: String?,
+    style: ProductTourTooltipStyle,
 ) {
     Column(
         modifier = Modifier
-            .widthIn(max = 320.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .padding(16.dp)
-            .border(1.dp, Color(0x22000000), RoundedCornerShape(16.dp)),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .widthIn(max = style.maxWidth)
+            .clip(style.shape)
+            .background(style.containerColor)
+            .padding(style.contentPadding)
+            .border(style.borderWidth, style.borderColor, style.shape)
+            .semantics { contentDescription = listOf(step.title, step.description).filter(String::isNotBlank).joinToString(". ") },
+        verticalArrangement = Arrangement.spacedBy(style.contentSpacing),
     ) {
-        BasicText(step.title)
-        BasicText(step.description)
-        if (progress != null) BasicText(progress)
+        BasicText(step.title, style = style.titleTextStyle.copy(color = style.contentColor))
+        BasicText(step.description, style = style.descriptionTextStyle.copy(color = style.contentColor))
+        if (progress != null) {
+            BasicText(progress, style = style.progressTextStyle.copy(color = style.contentColor))
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(style.actionSpacing),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BasicText(
@@ -307,6 +346,7 @@ private fun DefaultTourTooltip(
                 modifier = Modifier
                     .clickable(onClick = actions.skip)
                     .semantics { role = Role.Button },
+                style = style.actionTextStyle.copy(color = style.actionContentColor),
             )
             if (actions.canGoPrevious) {
                 BasicText(
@@ -314,6 +354,7 @@ private fun DefaultTourTooltip(
                     modifier = Modifier
                         .clickable(onClick = actions.previous)
                         .semantics { role = Role.Button },
+                    style = style.actionTextStyle.copy(color = style.actionContentColor),
                 )
             }
             val isLast = progress?.let {
@@ -330,6 +371,7 @@ private fun DefaultTourTooltip(
                         },
                     )
                     .semantics { role = Role.Button },
+                style = style.actionTextStyle.copy(color = style.actionContentColor),
             )
         }
     }
@@ -350,6 +392,13 @@ private fun TourOverlay(
         progress: String?,
     ) -> Unit,
 ) {
+    @Suppress("DEPRECATION")
+    val overlayStyle = config.overlayStyle ?: ProductTourOverlayStyle(
+        color = config.overlayColor,
+        alpha = config.overlayAlpha,
+        spotlightBorderColor = config.spotlightBorderColor,
+        spotlightBorderWidth = config.spotlightBorderWidth,
+    )
     val density = LocalDensity.current
     val paddingPx = with(density) { step.padding.dp.toPx() }
     val padded = Bounds(
@@ -368,7 +417,7 @@ private fun TourOverlay(
     val animatedRight by animateFloatAsState(padded.right, tween(duration), label = "spotlight-right")
     val animatedBottom by animateFloatAsState(padded.bottom, tween(duration), label = "spotlight-bottom")
     val overlayAlpha by animateFloatAsState(
-        if (state.isRunning) config.overlayAlpha else 0f,
+        if (state.isRunning) overlayStyle.alpha else 0f,
         tween(if (config.animation.overlay.enabled) config.animation.overlay.durationMillis else 0),
         label = "overlay-alpha",
     )
@@ -392,14 +441,17 @@ private fun TourOverlay(
                 }
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
         ) {
-            drawRect(color = config.overlayColor.copy(alpha = overlayAlpha))
+            drawRect(color = overlayStyle.color.copy(alpha = overlayAlpha))
             val path = spotlightPath(rect, step.spotlightShape)
             drawPath(path, color = Color.Transparent, blendMode = BlendMode.Clear)
-            if (config.spotlightBorderWidth > 0f && config.spotlightBorderColor.alpha > 0f) {
+            if (
+                overlayStyle.spotlightBorderWidth > 0f &&
+                    overlayStyle.spotlightBorderColor.alpha > 0f
+            ) {
                 drawPath(
                     path = path,
-                    color = config.spotlightBorderColor,
-                    style = Stroke(config.spotlightBorderWidth),
+                    color = overlayStyle.spotlightBorderColor,
+                    style = Stroke(overlayStyle.spotlightBorderWidth),
                 )
             }
         }

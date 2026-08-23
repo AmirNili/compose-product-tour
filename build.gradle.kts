@@ -10,14 +10,13 @@ plugins {
 }
 
 allprojects {
-    group = providers.gradleProperty("libraryGroup").getOrElse("com.example.compose.producttour")
+    group = providers.gradleProperty("libraryGroup").getOrElse("io.github.amirnili")
     version = providers.gradleProperty("libraryVersion").getOrElse("0.1.0")
 }
 
 subprojects {
     plugins.withId("com.android.library") {
         apply(plugin = "maven-publish")
-        apply(plugin = "signing")
 
         extensions.configure<LibraryExtension> {
             publishing {
@@ -54,25 +53,36 @@ subprojects {
                     }
                 }
 
-                providers.gradleProperty("mavenRepositoryUrl").orNull?.let { repositoryUrl ->
-                    repositories {
-                        maven {
-                            name = "ConfiguredRepository"
-                            url = uri(repositoryUrl)
-                            credentials {
-                                username = providers.gradleProperty("mavenUsername").orNull
-                                    ?: System.getenv("MAVEN_USERNAME")
-                                password = providers.gradleProperty("mavenPassword").orNull
-                                    ?: System.getenv("MAVEN_PASSWORD")
+                providers.gradleProperty("mavenRepositoryUrl")
+                    .orElse(providers.environmentVariable("MAVEN_REPOSITORY_URL"))
+                    .orNull
+                    ?.takeIf(String::isNotBlank)
+                    ?.let { repositoryUrl ->
+                        repositories {
+                            maven {
+                                name = "ConfiguredRepository"
+                                url = uri(repositoryUrl)
+                                credentials {
+                                    username = providers.gradleProperty("mavenUsername")
+                                        .orElse(providers.environmentVariable("MAVEN_USERNAME"))
+                                        .orNull
+                                    password = providers.gradleProperty("mavenPassword")
+                                        .orElse(providers.environmentVariable("MAVEN_PASSWORD"))
+                                        .orNull
+                                }
                             }
                         }
-                    }
                 }
             }
 
-            val signingKey = providers.gradleProperty("signingKey").orNull
-            val signingPassword = providers.gradleProperty("signingPassword").orNull
+            val signingKey = providers.gradleProperty("signingKey")
+                .orElse(providers.environmentVariable("SIGNING_KEY"))
+                .orNull
+            val signingPassword = providers.gradleProperty("signingPassword")
+                .orElse(providers.environmentVariable("SIGNING_PASSWORD"))
+                .orNull
             if (!signingKey.isNullOrBlank() && !signingPassword.isNullOrBlank()) {
+                apply(plugin = "signing")
                 extensions.configure<SigningExtension> {
                     useInMemoryPgpKeys(signingKey, signingPassword)
                     sign(extensions.getByType<PublishingExtension>().publications)

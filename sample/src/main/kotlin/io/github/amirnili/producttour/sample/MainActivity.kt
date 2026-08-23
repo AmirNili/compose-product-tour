@@ -44,7 +44,9 @@ import io.github.amirnili.producttour.sample.R
 import com.example.compose.producttour.core.model.SpotlightShape
 import com.example.compose.producttour.core.model.TourStep
 import com.example.compose.producttour.material.MaterialTourTooltip
+import com.example.compose.producttour.material.MaterialTourTooltipStyle
 import com.example.compose.producttour.ui.ProductTour
+import com.example.compose.producttour.ui.ProductTourOverlayStyle
 import com.example.compose.producttour.ui.ProductTourUiConfig
 import com.example.compose.producttour.ui.TourLabels
 import com.example.compose.producttour.ui.rememberProductTourState
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun SampleScreen() {
     var isPersian by remember { mutableStateOf(false) }
-    val steps = remember(isPersian) { sampleTourSteps(isPersian) }
+    val steps = remember(isPersian) { sampleTourSteps() }
     var selectedTab by remember { mutableIntStateOf(0) }
     var query by remember { mutableStateOf("") }
     val state = rememberProductTourState()
@@ -79,29 +81,35 @@ private fun SampleScreen() {
     ) {
         MaterialTheme {
             ProductTour(
-            state = state,
-            steps = steps,
-            config = ProductTourUiConfig(
-                showProgress = true,
-                spotlightBorderColor = MaterialTheme.colorScheme.primary,
-                spotlightBorderWidth = 3f,
+                state = state,
+                steps = steps,
+                config = ProductTourUiConfig(
+                    showProgress = true,
+                    overlayStyle = ProductTourOverlayStyle(
+                        spotlightBorderColor = MaterialTheme.colorScheme.primary,
+                        spotlightBorderWidth = 3f,
+                    ),
                     labels = TourLabels(
                         next = stringResource(R.string.tour_next),
                         previous = stringResource(R.string.tour_previous),
                         skip = stringResource(R.string.tour_skip),
                         finish = stringResource(R.string.tour_finish),
                     ),
-            ),
-            tooltipContent = { step, actions, labels, progress ->
-                MaterialTourTooltip(
-                    step = step,
-                    actions = actions,
-                    labels = labels,
-                    progress = progress,
-                    modifier = Modifier.widthIn(max = 360.dp),
-                )
-            },
-        ) {
+                ),
+                tooltipContent = { step, actions, labels, progress ->
+                    MaterialTourTooltip(
+                        step = step,
+                        actions = actions,
+                        labels = labels,
+                        progress = progress,
+                        modifier = Modifier.widthIn(max = 360.dp),
+                        style = MaterialTourTooltipStyle(
+                            primaryButtonContainerColor = MaterialTheme.colorScheme.primary,
+                            primaryButtonContentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    )
+                },
+            ) {
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -150,7 +158,6 @@ private fun SampleScreen() {
                         state.updateSteps(steps)
                         state.start()
                     },
-                    isPersian = isPersian,
                 )
             }
         }
@@ -158,9 +165,8 @@ private fun SampleScreen() {
     }
 }
 
-private fun sampleTourSteps(isPersian: Boolean): List<TourStep> {
-    return if (isPersian) {
-        listOf(
+private fun sampleTourSteps(): List<TourStep> {
+    return listOf(
             TourStep(
                 id = "search",
                 titleResId = R.string.tour_search_title,
@@ -187,35 +193,6 @@ private fun sampleTourSteps(isPersian: Boolean): List<TourStep> {
                 spotlightShape = SpotlightShape.RoundedRectangle,
             ),
         )
-    } else {
-        listOf(
-            TourStep(
-                id = "search",
-                titleResId = R.string.tour_search_title,
-                descriptionResId = R.string.tour_search_description,
-                spotlightShape = SpotlightShape.Rounded(20f),
-                padding = 1f,
-            ),
-            TourStep(
-                id = "card",
-                titleResId = R.string.tour_card_title,
-                descriptionResId = R.string.tour_card_description,
-                spotlightShape = SpotlightShape.RoundedRectangle,
-            ),
-            TourStep(
-                id = "action",
-                titleResId = R.string.tour_action_title,
-                descriptionResId = R.string.tour_action_description,
-                spotlightShape = SpotlightShape.Rounded(20f),
-            ),
-            TourStep(
-                id = "navigation",
-                titleResId = R.string.tour_navigation_title,
-                descriptionResId = R.string.tour_navigation_description,
-                spotlightShape = SpotlightShape.RoundedRectangle,
-            ),
-        )
-    }
 }
 
 @Composable
@@ -225,7 +202,6 @@ private fun HomeContent(
     onQueryChange: (String) -> Unit,
     onStartTour: () -> Unit,
     onRestartTour: () -> Unit,
-    isPersian: Boolean,
 ) {
     Column(
         modifier = Modifier

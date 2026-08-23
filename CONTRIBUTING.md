@@ -1,15 +1,21 @@
 # Contributing
 
-1. یک issue برای تغییر بزرگ باز کنید و ابتدا قرارداد عمومی را بررسی کنید.
-2. تغییرات را در scope همان ماژول نگه دارید و dependency جدید را توجیه کنید.
-3. برای API عمومی KDoc و برای منطق pure تست unit اضافه کنید.
-4. پیش از ارسال تغییرات این دستورات را اجرا کنید:
+## Workflow
 
-```text
+1. Open an issue for significant changes and discuss public API impact.
+2. Keep changes scoped to the relevant module.
+3. Add KDoc for public APIs and unit tests for pure logic.
+4. Avoid new dependencies unless they are justified.
+5. Do not commit secrets, signing keys, keystores, or credentials.
+
+## Validation
+
+Run the following before opening a pull request:
+
+```bash
 ./gradlew clean build
 ./gradlew test
 ./gradlew lint
 ```
 
-کد Kotlin از style رسمی پیروی می‌کند. Pull request باید توضیح روشن، تست و در صورت تغییر UI
-تصویر یا توضیح قابل بازتولید داشته باشد.
+Use Kotlin official formatting and keep public APIs minimal and stable.

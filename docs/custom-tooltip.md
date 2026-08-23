@@ -1,28 +1,32 @@
 # Custom tooltip
 
-برای کنترل کامل ظاهر tooltip از slot `tooltipContent` استفاده کنید. این slot فقط داده و action
-می‌گیرد و state داخلی را expose نمی‌کند:
+Use the `tooltipContent` slot for complete control over tooltip visuals. The
+slot receives the current step, localized labels, progress text, and navigation
+actions.
 
 ```kotlin
 ProductTour(
     state = state,
     steps = steps,
-    config = ProductTourUiConfig(labels = TourLabels(next = "Continue")),
+    config = ProductTourUiConfig(
+        labels = TourLabels(next = "Continue"),
+    ),
     tooltipContent = { step, actions, labels, progress ->
         MyTooltip(
             title = step.title,
             body = step.description,
             progress = progress,
+            nextLabel = labels.next,
             onNext = actions.next,
             onPrevious = actions.previous,
             onSkip = actions.skip,
-            nextLabel = labels.next,
+            onFinish = actions.finish,
         )
     },
 ) {
-    content()
+    AppContent()
 }
 ```
 
-کنترل‌های قابل دسترس باید semantics مناسب و role `Button` داشته باشند. متن‌های قابل مشاهده و
-labelها را از resource یا localization اپلیکیشن تأمین کنید.
+Custom controls should expose button roles and accessible labels. Use resource
+strings for application localization.
