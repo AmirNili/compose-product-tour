@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import com.example.compose.producttour.animation.TourAnimationConfig
 import com.example.compose.producttour.core.model.Bounds
 import com.example.compose.producttour.core.model.LayoutDirection
@@ -88,6 +89,7 @@ public data class TooltipActions(
     val previous: () -> Unit,
     val skip: () -> Unit,
     val finish: () -> Unit,
+    val canGoPrevious: Boolean = true,
 )
 
 /**
@@ -238,9 +240,10 @@ public fun ProductTour(
                         bottom = target.bottom - rootOffset.value.y,
                     )
                 }
-                if (state.isRunning && step != null && bounds != null && registration.isLaidOut) {
+                val resolvedStep = if (step != null) resolveTourStep(step) else null
+                if (state.isRunning && resolvedStep != null && bounds != null && registration.isLaidOut) {
                     TourOverlay(
-                        step = step,
+                        step = resolvedStep,
                         state = state,
                         target = bounds,
                         containerSize = rootSize.value,
@@ -251,6 +254,27 @@ public fun ProductTour(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun resolveTourStep(step: TourStep): TourStep {
+    val titleResId = step.titleResId
+    val descriptionResId = step.descriptionResId
+    val title = if (titleResId != null && titleResId != 0) {
+        stringResource(titleResId)
+    } else {
+        step.title
+    }
+    val description = if (descriptionResId != null && descriptionResId != 0) {
+        stringResource(descriptionResId)
+    } else {
+        step.description
+    }
+    return if (title == step.title && description == step.description) {
+        step
+    } else {
+        step.copy(title = title, description = description)
     }
 }
 
@@ -284,12 +308,14 @@ private fun DefaultTourTooltip(
                     .clickable(onClick = actions.skip)
                     .semantics { role = Role.Button },
             )
-            BasicText(
-                labels.previous,
-                modifier = Modifier
-                    .clickable(onClick = actions.previous)
-                    .semantics { role = Role.Button },
-            )
+            if (actions.canGoPrevious) {
+                BasicText(
+                    labels.previous,
+                    modifier = Modifier
+                        .clickable(onClick = actions.previous)
+                        .semantics { role = Role.Button },
+                )
+            }
             val isLast = progress?.let {
                 it.substringBefore('/').toIntOrNull() == it.substringAfter('/').toIntOrNull()
             } == true
@@ -450,9 +476,15 @@ private fun TooltipHost(
                         .joinToString(". ")
             },
         ) {
-            tooltipContent(
-                step,
-                TooltipActions(state::next, state::previous, state::skip, state::finish),
+        tooltipContent(
+            step,
+            TooltipActions(
+                next = state::next,
+                previous = state::previous,
+                skip = state::skip,
+                finish = state::finish,
+                canGoPrevious = state.currentStep > 0,
+            ),
                 config.labels,
                 progress,
             )

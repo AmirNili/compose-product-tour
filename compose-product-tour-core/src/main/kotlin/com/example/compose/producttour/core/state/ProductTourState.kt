@@ -22,7 +22,7 @@ public interface ProductTourState {
      */
     public fun updateSteps(steps: List<com.example.compose.producttour.core.model.TourStep>)
 
-    /** Starts the tour at the current step. */
+    /** Starts the tour; after a previous finish or skip, the next run starts at step zero. */
     public fun start()
 
     /** Advances to the next step, or finishes when already at the last step. */

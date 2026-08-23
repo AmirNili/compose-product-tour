@@ -19,6 +19,7 @@ private class DefaultProductTourState(
     private var steps: List<TourStep> = emptyList()
     private var index: Int = initialStep.coerceAtLeast(0)
     private var running: Boolean = false
+    private var restartFromBeginningOnStart: Boolean = false
 
     override val currentStep: Int
         get() = index
@@ -38,6 +39,10 @@ private class DefaultProductTourState(
 
     override fun start() {
         if (steps.isNotEmpty()) {
+            if (restartFromBeginningOnStart) {
+                index = 0
+                restartFromBeginningOnStart = false
+            }
             running = true
             steps.getOrNull(index)?.let { callbacks.onStepChanged(it, index) }
         }
@@ -62,12 +67,14 @@ private class DefaultProductTourState(
     override fun skip() {
         if (!running) return
         running = false
+        restartFromBeginningOnStart = true
         callbacks.onSkipped()
     }
 
     override fun finish() {
         if (!running) return
         running = false
+        restartFromBeginningOnStart = true
         callbacks.onFinished()
     }
 }

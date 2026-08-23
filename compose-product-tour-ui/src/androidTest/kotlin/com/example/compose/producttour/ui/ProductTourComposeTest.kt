@@ -113,7 +113,6 @@ class ProductTourComposeTest {
         composeRule.waitForIdle()
         composeRule.runOnIdle { state.start() }
         composeRule.onNodeWithText("Skip").assertHasClickAction()
-        composeRule.onNodeWithText("Previous").assertHasClickAction()
         composeRule.onNodeWithText("Finish").assertHasClickAction()
     }
 }

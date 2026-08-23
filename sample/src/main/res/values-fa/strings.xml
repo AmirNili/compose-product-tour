@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">تور معرفی محصول</string>
+    <string name="screen_title">تور معرفی محصول</string>
+    <string name="language_toggle">English</string>
+    <string name="tour_next">بعدی</string>
+    <string name="tour_previous">قبلی</string>
+    <string name="tour_skip">رد کردن</string>
+    <string name="tour_finish">پایان</string>
+    <string name="nav_home">خانه</string>
+    <string name="nav_saved">ذخیره‌شده</string>
+    <string name="nav_profile">پروفایل</string>
+    <string name="search_label">جست‌وجو</string>
+    <string name="start_tour">شروع تور</string>
+    <string name="featured_workspace">فضای کاری ویژه</string>
+    <string name="sample_description">یک صفحه نمونه برای بررسی دستی تور محصول.</string>
+    <string name="restart_tour">شروع دوباره تور</string>
+    <string name="replay_scenario">اجرای دوباره سناریو</string>
+    <string name="tour_search_title">جست‌وجو</string>
+    <string name="tour_search_description">برای جست‌وجو در فضای کاری از اینجا شروع کنید.</string>
+    <string name="tour_card_title">کارت ویژه</string>
+    <string name="tour_card_description">محتوای مهم با یک مستطیل گوشه‌گرد مشخص می‌شود.</string>
+    <string name="tour_action_title">عملیات اصلی</string>
+    <string name="tour_action_description">برای تکمیل جریان از این دکمه استفاده کنید.</string>
+    <string name="tour_navigation_title">ناوبری</string>
+    <string name="tour_navigation_description">ناوبری پایین صفحه در طول تور در دسترس است.</string>
+</resources>

@@ -1,8 +1,10 @@
 package io.github.amirnili.producttour.sample
 
 import android.os.Bundle
+import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import java.util.Locale
+import io.github.amirnili.producttour.sample.R
 import com.example.compose.producttour.core.model.SpotlightShape
 import com.example.compose.producttour.core.model.TourStep
 import com.example.compose.producttour.material.MaterialTourTooltip
@@ -49,53 +60,37 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SampleScreen() {
-    val steps = remember {
-        listOf(
-            TourStep(
-                id = "search",
-                title = "Search",
-                description = "Start here to search your workspace.",
-                spotlightShape = SpotlightShape.Circle,
-                padding = 10f,
-            ),
-            TourStep(
-                id = "card",
-                title = "Featured card",
-                description = "Important content can be highlighted with a rounded rectangle.",
-                spotlightShape = SpotlightShape.RoundedRectangle,
-            ),
-            TourStep(
-                id = "action",
-                title = "Primary action",
-                description = "Use the action button to complete the flow.",
-                spotlightShape = SpotlightShape.Rounded(20f),
-            ),
-            TourStep(
-                id = "navigation",
-                title = "Navigation",
-                description = "The bottom navigation remains available throughout the tour.",
-                spotlightShape = SpotlightShape.RoundedRectangle,
-            ),
-        )
-    }
+    var isPersian by remember { mutableStateOf(false) }
+    val steps = remember(isPersian) { sampleTourSteps(isPersian) }
     var selectedTab by remember { mutableIntStateOf(0) }
     var query by remember { mutableStateOf("") }
     val state = rememberProductTourState()
+    val baseContext = LocalContext.current
+    val baseConfiguration = LocalConfiguration.current
+    val localizedContext = remember(isPersian, baseContext, baseConfiguration) {
+        val configuration = Configuration(baseConfiguration)
+        configuration.setLocale(if (isPersian) Locale.forLanguageTag("fa") else Locale.ENGLISH)
+        baseContext.createConfigurationContext(configuration)
+    }
 
-    MaterialTheme {
-        ProductTour(
+    CompositionLocalProvider(
+        LocalContext provides localizedContext,
+        LocalLayoutDirection provides if (isPersian) LayoutDirection.Rtl else LayoutDirection.Ltr,
+    ) {
+        MaterialTheme {
+            ProductTour(
             state = state,
             steps = steps,
             config = ProductTourUiConfig(
                 showProgress = true,
                 spotlightBorderColor = MaterialTheme.colorScheme.primary,
                 spotlightBorderWidth = 3f,
-                labels = TourLabels(
-                    next = "Next",
-                    previous = "Previous",
-                    skip = "Skip",
-                    finish = "Finish",
-                ),
+                    labels = TourLabels(
+                        next = stringResource(R.string.tour_next),
+                        previous = stringResource(R.string.tour_previous),
+                        skip = stringResource(R.string.tour_skip),
+                        finish = stringResource(R.string.tour_finish),
+                    ),
             ),
             tooltipContent = { step, actions, labels, progress ->
                 MaterialTourTooltip(
@@ -110,12 +105,32 @@ private fun SampleScreen() {
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("Compose Product Tour") },
+                        title = {
+                            Text(stringResource(R.string.screen_title))
+                        },
+                        actions = {
+                            OutlinedButton(onClick = { isPersian = !isPersian }) {
+                                Text(stringResource(R.string.language_toggle))
+                            }
+                        },
                     )
                 },
                 bottomBar = {
                     NavigationBar(modifier = Modifier.tourTarget("navigation")) {
-                        listOf("Home", "Saved", "Profile").forEachIndexed { index, label ->
+                        val navigationLabels = if (isPersian) {
+                            listOf(
+                                stringResource(R.string.nav_home),
+                                stringResource(R.string.nav_saved),
+                                stringResource(R.string.nav_profile),
+                            )
+                        } else {
+                            listOf(
+                                stringResource(R.string.nav_home),
+                                stringResource(R.string.nav_saved),
+                                stringResource(R.string.nav_profile),
+                            )
+                        }
+                        navigationLabels.forEachIndexed { index, label ->
                             NavigationBarItem(
                                 selected = selectedTab == index,
                                 onClick = { selectedTab = index },
@@ -135,9 +150,71 @@ private fun SampleScreen() {
                         state.updateSteps(steps)
                         state.start()
                     },
+                    isPersian = isPersian,
                 )
             }
         }
+    }
+    }
+}
+
+private fun sampleTourSteps(isPersian: Boolean): List<TourStep> {
+    return if (isPersian) {
+        listOf(
+            TourStep(
+                id = "search",
+                titleResId = R.string.tour_search_title,
+                descriptionResId = R.string.tour_search_description,
+                spotlightShape = SpotlightShape.Rounded(20f),
+                padding = 1f,
+            ),
+            TourStep(
+                id = "card",
+                titleResId = R.string.tour_card_title,
+                descriptionResId = R.string.tour_card_description,
+                spotlightShape = SpotlightShape.RoundedRectangle,
+            ),
+            TourStep(
+                id = "action",
+                titleResId = R.string.tour_action_title,
+                descriptionResId = R.string.tour_action_description,
+                spotlightShape = SpotlightShape.Rounded(20f),
+            ),
+            TourStep(
+                id = "navigation",
+                titleResId = R.string.tour_navigation_title,
+                descriptionResId = R.string.tour_navigation_description,
+                spotlightShape = SpotlightShape.RoundedRectangle,
+            ),
+        )
+    } else {
+        listOf(
+            TourStep(
+                id = "search",
+                titleResId = R.string.tour_search_title,
+                descriptionResId = R.string.tour_search_description,
+                spotlightShape = SpotlightShape.Rounded(20f),
+                padding = 1f,
+            ),
+            TourStep(
+                id = "card",
+                titleResId = R.string.tour_card_title,
+                descriptionResId = R.string.tour_card_description,
+                spotlightShape = SpotlightShape.RoundedRectangle,
+            ),
+            TourStep(
+                id = "action",
+                titleResId = R.string.tour_action_title,
+                descriptionResId = R.string.tour_action_description,
+                spotlightShape = SpotlightShape.Rounded(20f),
+            ),
+            TourStep(
+                id = "navigation",
+                titleResId = R.string.tour_navigation_title,
+                descriptionResId = R.string.tour_navigation_description,
+                spotlightShape = SpotlightShape.RoundedRectangle,
+            ),
+        )
     }
 }
 
@@ -148,6 +225,7 @@ private fun HomeContent(
     onQueryChange: (String) -> Unit,
     onStartTour: () -> Unit,
     onRestartTour: () -> Unit,
+    isPersian: Boolean,
 ) {
     Column(
         modifier = Modifier
@@ -165,11 +243,12 @@ private fun HomeContent(
                 value = query,
                 onValueChange = onQueryChange,
                 modifier = Modifier.weight(1f).tourTarget("search"),
+                shape =  RoundedCornerShape(12.0.dp),
                 singleLine = true,
-                label = { Text("Search") },
+                label = { Text(stringResource(R.string.search_label)) },
             )
             Button(onClick = onStartTour) {
-                Text("Start Tour")
+                Text(stringResource(R.string.start_tour))
             }
         }
         Card(
@@ -178,9 +257,12 @@ private fun HomeContent(
                 .tourTarget("card"),
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text("Featured workspace", style = MaterialTheme.typography.titleLarge)
                 Text(
-                    "A compact sample screen for manual tour validation.",
+                    stringResource(R.string.featured_workspace),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Text(
+                    stringResource(R.string.sample_description),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -191,13 +273,13 @@ private fun HomeContent(
                 .tourTarget("action"),
             onClick = onRestartTour,
         ) {
-            Text("Restart Tour")
+            Text(stringResource(R.string.restart_tour))
         }
         OutlinedButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = onRestartTour,
         ) {
-            Text("Replay current scenario")
+            Text(stringResource(R.string.replay_scenario))
         }
     }
 }

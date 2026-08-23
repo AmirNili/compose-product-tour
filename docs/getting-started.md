@@ -8,8 +8,8 @@
 val steps = listOf(
     TourStep(
         id = "search",
-        title = "Search",
-        description = "Search your workspace.",
+        titleResId = R.string.tour_search_title,
+        descriptionResId = R.string.tour_search_description,
         spotlightShape = SpotlightShape.RoundedRectangle,
     ),
 )
@@ -40,5 +40,7 @@ ProductTour(state = tourState, steps = steps) {
 ./gradlew clean build
 ./gradlew publishToMavenLocal
 ```
+
+After `finish()` or `skip()`, the next `start()` call begins at the first step again.
 
 برای استفاده از Material 3، ماژول `compose-product-tour-material` را نیز اضافه کنید.

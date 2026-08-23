@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">Compose Product Tour</string>
+    <string name="screen_title">Compose Product Tour</string>
+    <string name="language_toggle">فارسی</string>
+    <string name="tour_next">Next</string>
+    <string name="tour_previous">Previous</string>
+    <string name="tour_skip">Skip</string>
+    <string name="tour_finish">Finish</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_saved">Saved</string>
+    <string name="nav_profile">Profile</string>
+    <string name="search_label">Search</string>
+    <string name="start_tour">Start Tour</string>
+    <string name="featured_workspace">Featured workspace</string>
+    <string name="sample_description">A compact sample screen for manual tour validation.</string>
+    <string name="restart_tour">Restart Tour</string>
+    <string name="replay_scenario">Replay current scenario</string>
+    <string name="tour_search_title">Search</string>
+    <string name="tour_search_description">Start here to search your workspace.</string>
+    <string name="tour_card_title">Featured card</string>
+    <string name="tour_card_description">Important content can be highlighted with a rounded rectangle.</string>
+    <string name="tour_action_title">Primary action</string>
+    <string name="tour_action_description">Use the action button to complete the flow.</string>
+    <string name="tour_navigation_title">Navigation</string>
+    <string name="tour_navigation_description">The bottom navigation remains available throughout the tour.</string>
 </resources>

@@ -15,6 +15,10 @@ The initial stable surface is intentionally small:
 
 Implementations remain private or internal wherever possible.
 
+`TourStep.titleResId` and `descriptionResId` optionally accept application string resource IDs.
+The Compose adapter resolves them using the host application's current `Resources` locale;
+direct `title` and `description` remain supported.
+
 ## Contracts
 
 ### Target registration

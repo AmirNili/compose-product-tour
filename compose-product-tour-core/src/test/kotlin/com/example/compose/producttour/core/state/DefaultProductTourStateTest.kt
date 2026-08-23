@@ -66,6 +66,20 @@ class DefaultProductTourStateTest {
     }
 
     @Test
+    fun tourStartsAtFirstStepAfterFinish() {
+        val state = createProductTourState()
+        state.updateSteps(steps)
+        state.start()
+        state.next()
+        state.next()
+        state.next()
+        assertFalse(state.isRunning)
+        state.start()
+        assertEquals(0, state.currentStep)
+        assertEquals("one", state.currentStepId)
+    }
+
+    @Test
     fun initialStepIsClampedWhenStepListChanges() {
         val state = createProductTourState(initialStep = 99)
         state.updateSteps(steps)

@@ -69,11 +69,13 @@ public fun MaterialTourTooltip(
                 ) {
                     Text(labels.skip, style = typography.labelLarge)
                 }
-                Button(
-                    onClick = actions.previous,
-                    colors = ButtonDefaults.textButtonColors(contentColor = colors.primary),
-                ) {
-                    Text(labels.previous, style = typography.labelLarge)
+                if (actions.canGoPrevious) {
+                    Button(
+                        onClick = actions.previous,
+                        colors = ButtonDefaults.textButtonColors(contentColor = colors.primary),
+                    ) {
+                        Text(labels.previous, style = typography.labelLarge)
+                    }
                 }
                 Button(
                     onClick = if (progress?.let {
