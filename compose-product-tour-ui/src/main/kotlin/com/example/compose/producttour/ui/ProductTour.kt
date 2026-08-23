@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -354,6 +355,15 @@ private fun TourOverlay(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            awaitPointerEvent().changes.forEach { change ->
+                                change.consume()
+                            }
+                        }
+                    }
+                }
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen },
         ) {
             drawRect(color = config.overlayColor.copy(alpha = overlayAlpha))
