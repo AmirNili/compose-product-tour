@@ -66,7 +66,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.ui.unit.LayoutDirection as ComposeLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 
@@ -350,14 +349,7 @@ private fun TourOverlay(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .semantics {
-                config.overlayContentDescription?.let { contentDescription = it }
-                dismiss {
-                    state.skip()
-                    true
-                }
-            },
+            .fillMaxSize(),
     ) {
         Canvas(
             modifier = Modifier
