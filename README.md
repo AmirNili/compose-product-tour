@@ -1,6 +1,6 @@
 # Compose Product Tour
 
-[![JitPack](https://jitpack.io/v/AmirNili/compose-product-tour-source.svg)](https://jitpack.io/#AmirNili/compose-product-tour-source)
+[![JitPack](https://jitpack.io/v/AmirNili/compose-product-tour.svg)](https://jitpack.io/#AmirNili/compose-product-tour)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green)
 ![Jetpack Compose 1.9.5](https://img.shields.io/badge/Jetpack%20Compose-1.9.5-blue)
@@ -48,10 +48,10 @@ Add the modules you need to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.AmirNili.compose-product-tour-source:compose-product-tour-core:v0.1.1")
-    implementation("com.github.AmirNili.compose-product-tour-source:compose-product-tour-ui:v0.1.1")
+    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-core:v0.1.2")
+    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-ui:v0.1.2")
     // Optional Material 3 tooltip adapter:
-    implementation("com.github.AmirNili.compose-product-tour-source:compose-product-tour-material:v0.1.1")
+    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-material:v0.1.2")
 }
 ```
 

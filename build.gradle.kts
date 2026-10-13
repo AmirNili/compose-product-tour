@@ -12,7 +12,7 @@ plugins {
 allprojects {
     val onJitPack = providers.environmentVariable("JITPACK").orNull == "true"
     group = if (onJitPack) {
-        "com.github.AmirNili.compose-product-tour-source"
+        "com.github.AmirNili.compose-product-tour"
     } else {
         providers.gradleProperty("libraryGroup").getOrElse("io.github.amirnili")
     }
