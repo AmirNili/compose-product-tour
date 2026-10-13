@@ -32,3 +32,18 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+.env
+
+# Signing keys
+*.p12
+*.asc
+
+# Secrets
+secrets.properties
+
+# Build outputs
+**/build/
+
+# Android Studio caches
+.idea/caches/

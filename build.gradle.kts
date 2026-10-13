@@ -10,8 +10,19 @@ plugins {
 }
 
 allprojects {
-    group = providers.gradleProperty("libraryGroup").getOrElse("io.github.amirnili")
-    version = providers.gradleProperty("libraryVersion").getOrElse("0.1.0")
+    val onJitPack = providers.environmentVariable("JITPACK").orNull == "true"
+    group = if (onJitPack) {
+        "com.github.AmirNili.compose-product-tour-source"
+    } else {
+        providers.gradleProperty("libraryGroup").getOrElse("io.github.amirnili")
+    }
+    version = if (onJitPack) {
+        providers.environmentVariable("VERSION")
+            .orElse(providers.gradleProperty("libraryVersion"))
+            .getOrElse("0.1.0")
+    } else {
+        providers.gradleProperty("libraryVersion").getOrElse("0.1.0")
+    }
 }
 
 subprojects {
