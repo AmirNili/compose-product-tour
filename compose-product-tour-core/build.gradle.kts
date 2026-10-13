@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.compose.producttour.core"
+    namespace = "io.github.amirnili.producttour.core"
     compileSdk = 37
 
     defaultConfig {

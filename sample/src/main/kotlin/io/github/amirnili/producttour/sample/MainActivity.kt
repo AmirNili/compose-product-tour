@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.content.res.Configuration
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,16 +40,19 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 import io.github.amirnili.producttour.sample.R
-import com.example.compose.producttour.core.model.SpotlightShape
-import com.example.compose.producttour.core.model.TourStep
-import com.example.compose.producttour.material.MaterialTourTooltip
-import com.example.compose.producttour.material.MaterialTourTooltipStyle
-import com.example.compose.producttour.ui.ProductTour
-import com.example.compose.producttour.ui.ProductTourOverlayStyle
-import com.example.compose.producttour.ui.ProductTourUiConfig
-import com.example.compose.producttour.ui.TourLabels
-import com.example.compose.producttour.ui.rememberProductTourState
-import com.example.compose.producttour.ui.target.tourTarget
+import io.github.amirnili.producttour.animation.TourAnimationConfig
+import io.github.amirnili.producttour.animation.TourAnimationSpec
+import io.github.amirnili.producttour.core.model.SpotlightShape
+import io.github.amirnili.producttour.core.model.TourStep
+import io.github.amirnili.producttour.core.state.TourCallbacks
+import io.github.amirnili.producttour.material.MaterialTourTooltip
+import io.github.amirnili.producttour.material.MaterialTourTooltipStyle
+import io.github.amirnili.producttour.ui.ProductTour
+import io.github.amirnili.producttour.ui.ProductTourOverlayStyle
+import io.github.amirnili.producttour.ui.ProductTourUiConfig
+import io.github.amirnili.producttour.ui.TourLabels
+import io.github.amirnili.producttour.ui.rememberProductTourState
+import io.github.amirnili.producttour.ui.target.tourTarget
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,10 +65,21 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun SampleScreen() {
     var isPersian by remember { mutableStateOf(false) }
-    val steps = remember(isPersian) { sampleTourSteps() }
+    val steps = remember { sampleTourSteps() }
     var selectedTab by remember { mutableIntStateOf(0) }
     var query by remember { mutableStateOf("") }
-    val state = rememberProductTourState()
+    var tourStatus by remember { mutableStateOf(SampleTourStatus.Ready) }
+    var currentStep by remember { mutableIntStateOf(0) }
+    val state = rememberProductTourState(
+        callbacks = TourCallbacks(
+            onStepChanged = { _, index ->
+                currentStep = index + 1
+                tourStatus = SampleTourStatus.Running
+            },
+            onFinished = { tourStatus = SampleTourStatus.Finished },
+            onSkipped = { tourStatus = SampleTourStatus.Skipped },
+        ),
+    )
     val baseContext = LocalContext.current
     val baseConfiguration = LocalConfiguration.current
     val localizedContext = remember(isPersian, baseContext, baseConfiguration) {
@@ -85,6 +98,11 @@ private fun SampleScreen() {
                 steps = steps,
                 config = ProductTourUiConfig(
                     showProgress = true,
+                    animation = TourAnimationConfig(
+                        overlay = TourAnimationSpec(durationMillis = 300),
+                        spotlight = TourAnimationSpec(durationMillis = 350),
+                        tooltip = TourAnimationSpec(durationMillis = 220),
+                    ),
                     overlayStyle = ProductTourOverlayStyle(
                         spotlightBorderColor = MaterialTheme.colorScheme.primary,
                         spotlightBorderWidth = 3f,
@@ -125,24 +143,25 @@ private fun SampleScreen() {
                 },
                 bottomBar = {
                     NavigationBar(modifier = Modifier.tourTarget("navigation")) {
-                        val navigationLabels = if (isPersian) {
-                            listOf(
-                                stringResource(R.string.nav_home),
-                                stringResource(R.string.nav_saved),
-                                stringResource(R.string.nav_profile),
-                            )
-                        } else {
-                            listOf(
-                                stringResource(R.string.nav_home),
-                                stringResource(R.string.nav_saved),
-                                stringResource(R.string.nav_profile),
-                            )
-                        }
+                        val navigationLabels = listOf(
+                            stringResource(R.string.nav_home),
+                            stringResource(R.string.nav_saved),
+                            stringResource(R.string.nav_profile),
+                        )
                         navigationLabels.forEachIndexed { index, label ->
                             NavigationBarItem(
                                 selected = selectedTab == index,
                                 onClick = { selectedTab = index },
-                                icon = { Text(label.take(1)) },
+                                icon = {
+                                    Text(
+                                        text = label.take(1),
+                                        modifier = if (index == 2) {
+                                            Modifier.tourTarget("profile")
+                                        } else {
+                                            Modifier
+                                        },
+                                    )
+                                },
                                 label = { Text(label) },
                             )
                         }
@@ -153,11 +172,18 @@ private fun SampleScreen() {
                     padding = padding,
                     query = query,
                     onQueryChange = { query = it },
-                    onStartTour = { state.start() },
-                    onRestartTour = {
-                        state.updateSteps(steps)
-                        state.start()
+                    tourStatus = when (tourStatus) {
+                        SampleTourStatus.Ready -> stringResource(R.string.tour_status_ready)
+                        SampleTourStatus.Running -> stringResource(
+                            R.string.tour_status_step,
+                            currentStep,
+                            steps.size,
+                        )
+                        SampleTourStatus.Finished -> stringResource(R.string.tour_status_finished)
+                        SampleTourStatus.Skipped -> stringResource(R.string.tour_status_skipped)
                     },
+                    onStartTour = { state.start() },
+                    onRestartTour = { state.start() },
                 )
             }
         }
@@ -167,32 +193,46 @@ private fun SampleScreen() {
 
 private fun sampleTourSteps(): List<TourStep> {
     return listOf(
-            TourStep(
-                id = "search",
-                titleResId = R.string.tour_search_title,
-                descriptionResId = R.string.tour_search_description,
-                spotlightShape = SpotlightShape.Rounded(20f),
-                padding = 1f,
-            ),
-            TourStep(
-                id = "card",
-                titleResId = R.string.tour_card_title,
-                descriptionResId = R.string.tour_card_description,
-                spotlightShape = SpotlightShape.RoundedRectangle,
-            ),
-            TourStep(
-                id = "action",
-                titleResId = R.string.tour_action_title,
-                descriptionResId = R.string.tour_action_description,
-                spotlightShape = SpotlightShape.Rounded(20f),
-            ),
-            TourStep(
-                id = "navigation",
-                titleResId = R.string.tour_navigation_title,
-                descriptionResId = R.string.tour_navigation_description,
-                spotlightShape = SpotlightShape.RoundedRectangle,
-            ),
-        )
+        TourStep(
+            id = "search",
+            titleResId = R.string.tour_search_title,
+            descriptionResId = R.string.tour_search_description,
+            spotlightShape = SpotlightShape.Rounded(20f),
+            padding = 1f,
+        ),
+        TourStep(
+            id = "card",
+            titleResId = R.string.tour_card_title,
+            descriptionResId = R.string.tour_card_description,
+            spotlightShape = SpotlightShape.RoundedRectangle,
+        ),
+        TourStep(
+            id = "action",
+            titleResId = R.string.tour_action_title,
+            descriptionResId = R.string.tour_action_description,
+            spotlightShape = SpotlightShape.Rounded(20f),
+        ),
+        TourStep(
+            id = "profile",
+            titleResId = R.string.tour_profile_title,
+            descriptionResId = R.string.tour_profile_description,
+            spotlightShape = SpotlightShape.Circle,
+            padding = 4f,
+        ),
+        TourStep(
+            id = "navigation",
+            titleResId = R.string.tour_navigation_title,
+            descriptionResId = R.string.tour_navigation_description,
+            spotlightShape = SpotlightShape.RoundedRectangle,
+        ),
+    )
+}
+
+private enum class SampleTourStatus {
+    Ready,
+    Running,
+    Finished,
+    Skipped,
 }
 
 @Composable
@@ -200,6 +240,7 @@ private fun HomeContent(
     padding: PaddingValues,
     query: String,
     onQueryChange: (String) -> Unit,
+    tourStatus: String,
     onStartTour: () -> Unit,
     onRestartTour: () -> Unit,
 ) {
@@ -210,6 +251,11 @@ private fun HomeContent(
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        Text(
+            text = tourStatus,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),

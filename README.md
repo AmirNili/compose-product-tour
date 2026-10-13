@@ -5,7 +5,7 @@
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green)
 ![Jetpack Compose 1.9.5](https://img.shields.io/badge/Jetpack%20Compose-1.9.5-blue)
 
-A modular, customizable product tour and coach marks library for Android apps built with Jetpack Compose.
+A modular, customizable product tour and coach marks library for Android apps built with Jetpack Compose. Public Kotlin packages use `io.github.amirnili.producttour`. Version `0.2.0` updates the package namespace from the initial placeholder namespace.
 
 ## Demo
 
@@ -48,20 +48,28 @@ Add the modules you need to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-core:v0.1.2")
-    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-ui:v0.1.2")
+    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-core:v0.2.0")
+    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-ui:v0.2.0")
     // Optional Material 3 tooltip adapter:
-    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-material:v0.1.2")
+    implementation("com.github.AmirNili.compose-product-tour:compose-product-tour-material:v0.2.0")
 }
 ```
 
-The UI module depends on core and animation. The Material module depends on core and UI. Add the animation module directly only if you use its API independently.
+The UI module depends on core and animation. The Material module depends on core and UI. Add the animation module directly only if you use its API independently. The in-repository sample uses published artifacts by default; set `-PsampleUsePublishedProductTour=false` to build it against local modules before a release is available.
 
 ## Quick start
 
 Create localized string resources for the step title and description, then define a step with the same ID as its target:
 
 ```kotlin
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import io.github.amirnili.producttour.core.model.SpotlightShape
+import io.github.amirnili.producttour.core.model.TourStep
+import io.github.amirnili.producttour.ui.ProductTour
+import io.github.amirnili.producttour.ui.rememberProductTourState
+import io.github.amirnili.producttour.ui.target.tourTarget
+
 @Composable
 fun SearchScreen() {
     val steps = listOf(

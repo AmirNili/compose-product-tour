@@ -27,8 +27,23 @@ android {
 
 }
 
+val usePublishedProductTour = providers.gradleProperty("sampleUsePublishedProductTour")
+    .map(String::toBoolean)
+    .orElse(providers.environmentVariable("JITPACK").map { it != "true" })
+    .getOrElse(true)
+
 dependencies {
-    implementation(project(":compose-product-tour-material"))
+    if (usePublishedProductTour) {
+        implementation(libs.compose.product.tour.core)
+        implementation(libs.compose.product.tour.ui)
+        implementation(libs.compose.product.tour.animation)
+        implementation(libs.compose.product.tour.material)
+    } else {
+        implementation(project(":compose-product-tour-core"))
+        implementation(project(":compose-product-tour-ui"))
+        implementation(project(":compose-product-tour-animation"))
+        implementation(project(":compose-product-tour-material"))
+    }
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)

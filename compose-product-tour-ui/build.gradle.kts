@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.compose.producttour.ui"
+    namespace = "io.github.amirnili.producttour.ui"
     compileSdk = 37
 
     defaultConfig {

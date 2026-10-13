@@ -1,5 +1,6 @@
 [versions]
 agp = "9.3.1"
+composeProductTourCore = "v0.2.0"
 kotlin = "2.2.21"
 compose = "1.9.5"
 material3 = "1.4.0"
@@ -22,6 +23,10 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "compose" }
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
+compose-product-tour-animation = { module = "com.github.AmirNili.compose-product-tour:compose-product-tour-animation", version.ref = "composeProductTourCore" }
+compose-product-tour-core = { module = "com.github.AmirNili.compose-product-tour:compose-product-tour-core", version.ref = "composeProductTourCore" }
+compose-product-tour-material = { module = "com.github.AmirNili.compose-product-tour:compose-product-tour-material", version.ref = "composeProductTourCore" }
+compose-product-tour-ui = { module = "com.github.AmirNili.compose-product-tour:compose-product-tour-ui", version.ref = "composeProductTourCore" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.compose.producttour.animation"
+    namespace = "io.github.amirnili.producttour.animation"
     compileSdk = 37
 
     defaultConfig {

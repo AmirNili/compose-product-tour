@@ -23,4 +23,10 @@
     <string name="tour_action_description">برای تکمیل جریان از این دکمه استفاده کنید.</string>
     <string name="tour_navigation_title">ناوبری</string>
     <string name="tour_navigation_description">ناوبری پایین صفحه در طول تور در دسترس است.</string>
+    <string name="tour_profile_title">میان‌بر پروفایل</string>
+    <string name="tour_profile_description">برای هدف‌های کوچک مثل آیکن‌ها می‌توان از نورافکن دایره‌ای استفاده کرد.</string>
+    <string name="tour_status_ready">تور آماده است؛ برای دیدن مراحل شروعش کنید.</string>
+    <string name="tour_status_step">تور در حال اجراست: مرحلهٔ %1$d از %2$d</string>
+    <string name="tour_status_finished">تور تمام شد؛ برای اجرای دوباره شروعش کنید.</string>
+    <string name="tour_status_skipped">تور رد شد؛ هر زمان آماده بودید دوباره شروعش کنید.</string>
 </resources>

@@ -23,4 +23,10 @@
     <string name="tour_action_description">Use the action button to complete the flow.</string>
     <string name="tour_navigation_title">Navigation</string>
     <string name="tour_navigation_description">The bottom navigation remains available throughout the tour.</string>
+    <string name="tour_profile_title">Profile shortcut</string>
+    <string name="tour_profile_description">Circular spotlights work well for compact icon targets.</string>
+    <string name="tour_status_ready">Tour ready. Start it to try the full flow.</string>
+    <string name="tour_status_step">Tour in progress: step %1$d of %2$d</string>
+    <string name="tour_status_finished">Tour finished. Start it again to replay.</string>
+    <string name="tour_status_skipped">Tour skipped. Start it again whenever you are ready.</string>
 </resources>
