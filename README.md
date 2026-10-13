@@ -9,9 +9,9 @@ A modular, customizable product tour and coach marks library for Android apps bu
 
 ## Demo
 
-<!-- Add a product tour GIF or screenshot here. -->
-
-**Preview:** _GIF/demo coming soon._
+<p align="center">
+  <img src="demo/product-tour.gif" alt="Compose Product Tour highlighting five targets with spotlight overlays and tooltips" width="320">
+</p>
 
 ## Features
 
