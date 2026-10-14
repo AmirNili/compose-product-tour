@@ -5,7 +5,9 @@
 ![minSdk 24](https://img.shields.io/badge/minSdk-24-green)
 ![Jetpack Compose 1.9.5](https://img.shields.io/badge/Jetpack%20Compose-1.9.5-blue)
 
-A modular, customizable product tour and coach marks library for Android apps built with Jetpack Compose. Public Kotlin packages use `io.github.amirnili.producttour`. Version `0.2.0` updates the package namespace from the initial placeholder namespace.
+A modular, customizable product tour and coach marks library for Android apps built with Jetpack Compose.
+
+**Package prefix:** `io.github.amirnili.producttour` (since `v0.2.0`).
 
 ## Demo
 
@@ -55,15 +57,19 @@ dependencies {
 }
 ```
 
-The UI module depends on core and animation. The Material module depends on core and UI. Add the animation module directly only if you use its API independently. The in-repository sample uses published artifacts by default; set `-PsampleUsePublishedProductTour=false` to build it against local modules before a release is available.
+The UI module depends on core and animation. The Material module depends on core and UI. Add the animation module directly only if you use its API independently.
 
 ## Quick start
 
-Create localized string resources for the step title and description, then define a step with the same ID as its target:
+Create a tour state, define a step, and mark a composable with the same target ID:
 
 ```kotlin
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.github.amirnili.producttour.core.model.SpotlightShape
 import io.github.amirnili.producttour.core.model.TourStep
 import io.github.amirnili.producttour.ui.ProductTour
@@ -72,18 +78,24 @@ import io.github.amirnili.producttour.ui.target.tourTarget
 
 @Composable
 fun SearchScreen() {
+    val tourState = rememberProductTourState()
     val steps = listOf(
         TourStep(
             id = "search",
-            titleResId = R.string.tour_search_title,
-            descriptionResId = R.string.tour_search_description,
+            title = "Search",
+            description = "Tap here to search your workspace.",
             spotlightShape = SpotlightShape.RoundedRectangle,
         ),
     )
-    val tourState = rememberProductTourState()
 
     ProductTour(state = tourState, steps = steps) {
-        SearchButton(Modifier.tourTarget("search"))
+        BasicText(
+            text = "Search",
+            modifier = Modifier
+                .tourTarget("search")
+                .clickable(onClick = {})
+                .padding(16.dp),
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -92,7 +104,9 @@ fun SearchScreen() {
 }
 ```
 
-See [Getting Started](docs/getting-started.md) for imports, resources, and lifecycle details.
+For localized tour text, use `titleResId` and `descriptionResId` with string resources from your app.
+
+See [Getting Started](docs/getting-started.md) for lifecycle details.
 
 ## Modules
 
@@ -125,6 +139,12 @@ See [Getting Started](docs/getting-started.md) for imports, resources, and lifec
 ./gradlew clean build
 ./gradlew test
 ./gradlew lint
+```
+
+The sample consumes published artifacts by default. To build it against the local library modules while developing:
+
+```bash
+./gradlew -PsampleUsePublishedProductTour=false :sample:assembleDebug
 ```
 
 ## License
